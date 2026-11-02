@@ -1,0 +1,9 @@
+{
+  "source_commit": "a469c4ca0514e10f29d4808412bf34acea2b8e7a",
+  "files": {
+    "scripts/vendor/initial_program.py": "62cfe4bff0d192b8ec9f6fd983826d7638bc98919ba17a5ba679927c09fd2493",
+    "scripts/vendor/best_program.py": "94ceb02cdc4cf92790de9b0b7d8eb6040d0a34e7aea83efd4ab47be4dcc3db91"
+  },
+  "unchanged_vendor_files": true,
+  "downloaded_data_gitignored": true
+}

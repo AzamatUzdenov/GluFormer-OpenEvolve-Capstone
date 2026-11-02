@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/AzamatUzdenov/GluFormer-OpenEvolve",
+  "commit": "a469c4ca0514e10f29d4808412bf34acea2b8e7a",
+  "user_selected_on": "2026-11-02",
+  "included_scope": [
+    "two fixed historical predictor programs",
+    "three public demo CSVs",
+    "saved aggregate scores",
+    "primary Shanghai archive filename metadata"
+  ],
+  "excluded_scope": [
+    "new LLM search",
+    "GluFormer pretraining",
+    "private HPP or 10K data",
+    "clinical validation",
+    "full independent dataset audit"
+  ],
+  "data_archive": {
+    "doi": "10.6084/m9.figshare.21600933.v5",
+    "file_id": 42966622,
+    "sha256": "59b5f5c4053a32bb6b7827844a0191597dc82228fe88ce332a189fdfc659c4cb",
+    "license": "CC BY 4.0"
+  },
+  "changes_from_historical_code": "Only external file-resolution wrapper; vendor model and CV source bytes unchanged. New data audit and report added.",
+  "original_execution_environment": "Not recovered; current environment locks versions declared in the public repository for the numerical core."
+}

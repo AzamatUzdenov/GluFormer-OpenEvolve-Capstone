@@ -1,11 +1,29 @@
 {
-  "source_work": null,
-  "source_version": null,
-  "research_question": null,
-  "primary_result": null,
-  "data_location": null,
-  "data_license": null,
-  "code_license": null,
-  "stage": "scaffold",
-  "status": "awaiting_user_source_selection"
+  "source_repository": "https://github.com/AzamatUzdenov/GluFormer-OpenEvolve",
+  "source_commit": "a469c4ca0514e10f29d4808412bf34acea2b8e7a",
+  "question": "Can the saved baseline-versus-evolved development-CV comparison be reproduced from pinned public inputs and code?",
+  "phase": "historical_replay",
+  "n_seeds": 10,
+  "n_folds": 5,
+  "recorded_baseline": {
+    "combined_score": 0.5956,
+    "pearson_r": 0.4507,
+    "spearman_r": 0.5002,
+    "prediction_stability": 0.9745
+  },
+  "baseline_rounding_tolerance": 5e-05,
+  "recorded_candidate": {
+    "combined_score": 0.620686,
+    "pearson_r": 0.463114,
+    "spearman_r": 0.540357,
+    "prediction_stability": 0.977325
+  },
+  "candidate_tolerance": 5e-06,
+  "limitations": [
+    "Development data reused during the original search",
+    "Baseline and candidate use different inputs",
+    "Historical targets are standardized per training fold but predictions are pooled without inverse scaling",
+    "Historical ID normalization merges different participants and splits repeated records, confirmed against primary archive filenames; GMI IDs lose date precision",
+    "Full OpenEvolve search history and original environment lock are not available in the selected repository"
+  ]
 }

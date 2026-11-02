@@ -31,4 +31,5 @@ reports/*_files/
 # Python and OS clutter
 __pycache__/
 .DS_Store
+.runtime/
 Thumbs.db

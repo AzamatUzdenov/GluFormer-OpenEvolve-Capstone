@@ -1,3 +1,5 @@
 # pixi.lock is generated: no 3-way merges, collapsed in diffs
 pixi.lock merge=binary linguist-language=YAML linguist-generated=true -diff
 *.sh text eol=lf
+# Preserve the exact source bytes, including upstream trailing spaces.
+scripts/vendor/*.py -whitespace

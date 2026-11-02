@@ -1,24 +1,28 @@
-# Software environment of this project. Edit it with `pixi add <package>`;
-# Pixi records the exact versions it installed in pixi.lock (commit both).
 [workspace]
-name = "capstone-project"
-description = "Reproducible subset of an existing analysis; source selection pending"
+name = "gluformer-openevolve-capstone"
+description = "Reproduce and audit the saved OpenEvolve-selected HbA1c head"
 authors = ["Azamat Uzdenov <azamuzdenov@gmail.com>"]
-channels = ["conda-forge", "bioconda"]
-platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
 version = "0.1.0"
 
 [dependencies]
-python = "3.13.*"
-quarto = ">=1.9"
-jupyterlab = ">=4"
-ipykernel = ">=7"
-pandas = ">=2"
-matplotlib = ">=3.9"
-papermill = ">=2.6"   # Quarto needs it for report parameters (-P)
+python = "3.10.*"
+numpy = "==1.26.4"
+pandas = "==2.2.2"
+scikit-learn = "==1.5.0"
+scipy = "==1.14.0"
+matplotlib = ">=3.9,<4"
+quarto = ">=1.9,<1.11"
+jupyterlab = ">=4,<5"
+ipykernel = ">=6,<7"
+papermill = ">=2.6,<3"
 
 [tasks]
-check = { cmd = "python --version && quarto --version", description = "Check that the tools work" }
-# `reproduce` must rebuild every result from the raw data with one command.
-# The source analysis is pending; the guard exits nonzero until it is connected.
-reproduce = { cmd = "python scripts/reproduce.py", description = "Awaiting source selection; exits with code 2" }
+download = "python scripts/download_data.py"
+audit = { cmd = "python scripts/audit_data.py", depends-on = ["download"] }
+replay = { cmd = "python scripts/replay.py", depends-on = ["audit"] }
+report = { cmd = "python scripts/render_report.py", depends-on = ["replay"] }
+reproduce = { depends-on = ["report"] }
+check = "python -m unittest discover -s tests -v"
+match-historical = "python scripts/check_historical_match.py"

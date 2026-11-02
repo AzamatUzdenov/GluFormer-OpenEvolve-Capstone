@@ -1,0 +1,7 @@
+Title: Reproducibility audit of an OpenEvolve-selected HbA1c predictor on frozen GluFormer embeddings
+
+This project will make a small, fixed part of my GluFormer-OpenEvolve work reproducible: the comparison between the original regression head and the saved OpenEvolve-selected candidate on the public Shanghai demo inputs. I will pin the source version, record data checksums, audit identifier joins, and provide a locked environment and one command that rebuilds the metrics and a Quarto report. The first milestone reproduces the historical development-CV calculation without changing the selected models. The next milestone will separate corrections to target scaling and input-matched baselines from the historical replay. Reusing the original development data cannot establish independent generalization or a clinical benefit, and no such claim will be made. The full LLM search and GluFormer pretraining are outside this bounded capstone stage.
+
+Source: https://github.com/AzamatUzdenov/GluFormer-OpenEvolve
+Pinned commit: a469c4ca0514e10f29d4808412bf34acea2b8e7a
+Status: draft for review; not submitted to the course spreadsheet or instructor.
