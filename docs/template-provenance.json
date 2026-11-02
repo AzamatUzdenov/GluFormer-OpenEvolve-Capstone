@@ -1,0 +1,18 @@
+{
+  "template_repository": "https://github.com/khan-lab/cbio7501-f26",
+  "commit": "51a432116e3ad4aefa927e70602d67562d460b11",
+  "commit_date": "2026-10-31T10:43:47+04:00",
+  "template_path": "templates/cookiecutter-repro-project",
+  "created_date_local": "2026-11-02",
+  "timezone": "Asia/Dubai",
+  "generator": "Cookiecutter 2.7.1 via Pixi",
+  "scope": "Local scaffold only; source analysis pending; no remote repository or release",
+  "license_choice": "Decide later",
+  "initial_language": "Python (template default, provisional)",
+  "changes": [
+    "Russian status, plan and requirements",
+    "Explicit nonzero reproduction guard",
+    "No fabricated repository URL or release date in CITATION",
+    "Input manifest header only"
+  ]
+}
