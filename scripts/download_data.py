@@ -1,4 +1,4 @@
-"""Download only the three pinned public demo CSVs and verify every byte."""
+"""Download the pinned public demo inputs and archive; verify every byte."""
 import csv
 import hashlib
 import os

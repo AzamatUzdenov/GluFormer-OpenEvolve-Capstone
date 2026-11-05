@@ -1,84 +1,101 @@
-# GluFormer + OpenEvolve: воспроизводимое сравнение
+# Reproducibility audit of HbA1c prediction with GluFormer and OpenEvolve
 
-Учебный capstone для The Art of Reproducible and Open Science (Aziz Khan).
-Автор: Azamat Uzdenov. Источник выбран пользователем 2 ноября 2026:
-[AzamatUzdenov/GluFormer-OpenEvolve](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve),
-commit `a469c4ca0514e10f29d4808412bf34acea2b8e7a`.
+Reproduce and audit an OpenEvolve-selected HbA1c predictor built on frozen GluFormer embeddings using public Shanghai data, with a locked environment and a Quarto report.
 
-## Вопрос и границы
+Capstone for **The Art of Reproducible and Open Science (Aziz Khan)**.
+Author: Azamat Uzdenov. [Course repository](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone).
 
-Можно ли воспроизвести сохранённое сравнение исходной модели и выбранного
-OpenEvolve варианта на тех же публичных входах? Первый этап повторяет прежнюю
-кросс-валидацию (проверку на нескольких разбиениях данных) без изменения
-модельного кода. Это проверка воспроизводимости исторического расчёта.
+## Current status
 
-Она не подтверждает преимущество алгоритма поиска или клиническую полезность.
-Раньше при поиске использовались те же данные, варианты получают разные признаки,
-а исторический код объединяет предсказания без возврата в исходную шкалу HbA1c.
-Проверка первичного архива уже выявила слияние разных участников и разделение повторных записей одного участника. Исправленный анализ ещё не выполнен.
+This is a work in progress. The current stage rebuilds the historical development
+cross-validation for two fixed programs and reports its limitations. The strict
+historical-number check failed in the recorded replay because Spearman values
+differed. The audit also identified defective participant grouping and a
+historical target-scaling problem. A completed pipeline means that the audit was
+rebuilt; it does not establish model quality or an OpenEvolve advantage.
 
-## Данные (data)
+Corrected evaluation, independent testing, the partner's real reproducibility
+report and the final course release are still pending.
 
-Для расчёта используются три публичных demo CSV из выбранного репозитория:
-готовые 1024-мерные представления GluFormer, GMI и HbA1c Shanghai.
-Точные ссылки, версии и SHA-256: `metadata/data_sources.tsv`.
-Git blob IDs совпадают с публичным upstream Guylu/GluFormer.
-Исходный архив Shanghai опубликован на Figshare (21600933, v5) под CC BY 4.0.
-Дополнительно скачивается первичный архив v5 для проверки имён записей.
-Производные embeddings распространяются в upstream-репозитории; авторство
-GluFormer сохраняется. Закрытые HPP/10K-данные не используются.
+## Reproduce
 
-Загрузчик проверяет каждый файл, делает его доступным только для чтения
-и сохраняет в `data/raw/`. Сами CSV и созданные результаты исключены из Git.
-
-## Как повторить (reproduce)
-
-Нужен Pixi и интернет для первой загрузки окружения и публичных CSV.
-Из корня проекта:
+Install [Pixi](https://pixi.prefix.dev/), then run from a clean clone:
 
 ```bash
+git clone https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone.git
+cd GluFormer-OpenEvolve-Capstone
 pixi install --locked
 pixi run reproduce
+pixi run check
 ```
 
-Порядок: загрузка и проверка данных, аудит соединений, повторение двух моделей,
-сборка `reports/report.html`. Полный LLM-поиск не запускается, API-ключ не нужен.
-`pixi run check` запускает проверки проекта после получения результатов.
+This downloads and verifies public inputs, audits identifier joins, runs the
+fixed baseline and selected candidate, and builds `reports/report.html`.
+A CPU is sufficient. The GluFormer embeddings are already computed; no GPU,
+LLM API key or access to the private historical repository is needed.
+The lock contains macOS arm64 and Linux x86_64 environments.
 
-## Оборудование (hardware)
+For the separate strict comparison with historical saved numbers:
 
-Этап работает на CPU, готовые embeddings уже вычислены. GPU не требуется.
-В lock предусмотрены macOS arm64 и Linux x86_64. Фактически проверенную платформу,
-время выполнения и ограничения см. в отчёте этапа; решение зависимостей для Linux
-само по себе не считается проверенным запуском на Linux.
+```bash
+pixi run match-historical
+```
 
-## Выход (output)
+This command intentionally returns a nonzero exit code when the recorded
+numbers do not match within the declared tolerances. `pixi run reproduce`
+still builds the audit report so that a negative result remains inspectable.
 
-- `results/data_audit.json`: только агрегаты размеров, пропусков и объединений ID.
-- `results/replay.json`: пересчитанные метрики, отклонение от сохранённых значений,
-  версии программ и время.
-- `reports/report.html`: таблицы, рисунок и ограничения расчёта.
+## Data and source provenance
 
-Команда reproduce строит отчёт аудита, включая отрицательные результаты.
-Отдельная строгая проверка `pixi run match-historical` возвращает ошибку, если
-сохранённые числа не совпали с пересчитанными в заданных допусках.
-На текущем запуске эта строгая проверка не прошла: различается Spearman.
-Исторические округлённые числа и допуски сохранены в `config/project.json`.
+Three public demo CSVs contain frozen 1024-dimensional GluFormer embeddings,
+GMI and Shanghai HbA1c values. They are downloaded directly from
+[Guylu/GluFormer](https://github.com/Guylu/GluFormer/tree/0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac/demo),
+pinned to commit `0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac`. All three files preserve
+the SHA-256 and Git blob IDs of the original source snapshot.
+The primary Shanghai archive is pinned to
+[Figshare dataset 21600933, version 5](https://doi.org/10.6084/m9.figshare.21600933.v5),
+CC BY 4.0; this stage inspects archive filenames for record identity.
+Exact URLs, file sizes and checksums are in `metadata/data_sources.tsv`.
 
-## Источники, лицензия и цитирование (cite, license)
+The two historical programs are included unchanged under `scripts/vendor/`,
+with checksums in `metadata/source_code.json`. Their source commit is
+`a469c4ca0514e10f29d4808412bf34acea2b8e7a` from the original
+GluFormer-OpenEvolve repository, which is now private. The external wrapper
+changes file lookup only; it preserves the original models and evaluation.
+No private HPP or 10K laboratory data are used. Downloads are made read-only
+and excluded from Git.
 
-Два файла в `scripts/vendor/` скопированы без изменений; их SHA-256 проверяется
-перед запуском. Внешняя обёртка меняет только поиск файлов данных.
-Код: Apache-2.0, `LICENSE` и `NOTICE`. Лицензия шаблона курса отдельно в
-`docs/template-LICENSE.txt`. DOI исходных данных:
-https://doi.org/10.6084/m9.figshare.21600933.v5 .
-Предварительная ссылка для цитирования проекта находится в `CITATION.cff`;
-релиза и удалённого capstone-репозитория пока нет.
+## Outputs
 
-## Следующие этапы
+- `results/data_audit.json`: aggregate input and identifier-join diagnostics.
+- `results/replay.json`: recomputed metrics, differences from the saved values,
+  software versions and execution time.
+- `reports/report.html`: self-contained Quarto report with tables, a figure and
+  the evaluation limitations.
 
-Сначала проверить результат исторического повторения и допустимость объединения
-ID. Затем исправить единицы предсказаний, добавить простые модели с одинаковыми
-входами и показать изменения отдельно. После этого проверить чистый клон,
-GitHub Actions и провести реальный обмен с партнёром по курсу.
-План: `docs/PLAN_RU.txt`. Черновик описания: `docs/PROPOSAL_EN.txt`.
+These files are regenerated rather than committed. The GitHub Actions workflow
+rebuilds the project from a fresh Linux checkout and retains results as a
+short-lived workflow artifact. A successful workflow confirms execution of the
+audit and checks, not exact historical matching or scientific acceptance.
+
+## Interpretation limits and next stage
+
+The original search reused the development data. The baseline and candidate
+receive different inputs. Historical targets are standardized per training fold,
+but predictions are pooled without restoring the original HbA1c units.
+The original identifier normalization merges different participants and splits
+repeated records from one participant; the filename audit confirms this defect.
+GMI identifiers also lose exact date precision.
+
+The next stage will correct participant grouping and target scaling, compare
+simple models using the same inputs, and keep the corrected evaluation separate
+from this historical replay. Reusing the development dataset cannot establish
+independent generalization or clinical benefit. Full OpenEvolve search and
+GluFormer pretraining are outside the current stage.
+
+## License and citation
+
+Code is licensed under Apache-2.0. Original GluFormer authors and work are
+credited in `NOTICE`; the course template's MIT license is preserved in
+`docs/template-LICENSE.txt`. `CITATION.cff` records the software and data sources.
+A final release and the partner's report remain pending.

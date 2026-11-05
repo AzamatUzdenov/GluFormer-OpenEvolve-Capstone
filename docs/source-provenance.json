@@ -22,5 +22,9 @@
     "license": "CC BY 4.0"
   },
   "changes_from_historical_code": "Only external file-resolution wrapper; vendor model and CV source bytes unchanged. New data audit and report added.",
-  "original_execution_environment": "Not recovered; current environment locks versions declared in the public repository for the numerical core."
+  "original_execution_environment": "Not recovered; current environment locks versions declared in the public repository for the numerical core.",
+  "historical_repository_access": "The original source repository is private. The two fixed model files are included in scripts/vendor/ and verified against metadata/source_code.json; no access to the private repository is needed to run this capstone.",
+  "public_demo_repository": "https://github.com/Guylu/GluFormer",
+  "public_demo_commit": "0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac",
+  "capstone_repository": "https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone"
 }

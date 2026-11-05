@@ -110,8 +110,13 @@ software = pd.DataFrame(replay["software"].items(), columns=["Component", "Versi
 display(software.style.hide(axis="index"))
 ```
 
-Model code and public demo CSVs: [AzamatUzdenov/GluFormer-OpenEvolve](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve),
-pinned in the project metadata. The three CSV Git blob IDs also match the public
-[upstream GluFormer demo](https://github.com/Guylu/GluFormer/tree/main/demo).
+The two fixed model programs are included in this capstone under `scripts/vendor/`.
+Their original source commit, `a469c4ca0514e10f29d4808412bf34acea2b8e7a`,
+and file checksums are preserved in the project metadata. The original
+GluFormer-OpenEvolve repository is private; running this capstone does not require access.
+The three CSVs are downloaded directly from the public
+[upstream GluFormer demo](https://github.com/Guylu/GluFormer/tree/0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac/demo),
+pinned to commit `0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac` with the same recorded checksums.
+The primary Shanghai archive is also pinned in `metadata/data_sources.tsv`.
 The upstream encoder and work are credited in LICENSE and NOTICE.
 No private laboratory data or API key is used in this replay.

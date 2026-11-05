@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "Please cite the pinned source repository and original GluFormer work."
-title: "GluFormer OpenEvolve reproducibility audit"
+title: "Reproducibility audit of HbA1c prediction with GluFormer and OpenEvolve"
 type: software
 authors:
   - given-names: "Azamat"
@@ -8,6 +8,7 @@ authors:
     email: "azamuzdenov@gmail.com"
     orcid: "https://orcid.org/0009-0007-9124-7349"
 license: Apache-2.0
+repository-code: "https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone"
 version: 0.1.0
 references:
   - type: software
