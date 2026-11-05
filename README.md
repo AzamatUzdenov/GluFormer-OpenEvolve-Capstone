@@ -19,7 +19,10 @@ report and the final course release are still pending.
 
 ## Reproduce
 
-Install [Pixi](https://pixi.prefix.dev/), then run from a clean clone:
+Install [Pixi](https://pixi.prefix.dev/), then run from a clean clone.
+Use a project path **without spaces**: the current conda/Pixi Quarto activation
+truncates its tool paths when the environment prefix contains spaces. The
+canonical course workspace and a clean Linux GitHub Actions run both passed.
 
 ```bash
 git clone https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone.git
