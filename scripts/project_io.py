@@ -14,6 +14,19 @@ os.environ["OMP_NUM_THREADS"] = "1"
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def runtime_environment():
+    """Use project-local caches for notebook and report execution."""
+    env = os.environ.copy()
+    for variable, folder in (("JUPYTER_RUNTIME_DIR", "jupyter"),
+                             ("JUPYTER_DATA_DIR", "jupyter-data"),
+                             ("IPYTHONDIR", "ipython"),
+                             ("MPLCONFIGDIR", "matplotlib")):
+        path = ROOT / ".runtime" / folder
+        path.mkdir(parents=True, exist_ok=True)
+        env[variable] = str(path)
+    return env
+
+
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
