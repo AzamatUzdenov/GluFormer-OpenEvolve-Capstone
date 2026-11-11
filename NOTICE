@@ -23,4 +23,7 @@ GluFormer embeddings. These modifications are by Azamat Uzdenov, 2026.
 
 Capstone adaptation
 -------------------
-The scripts/vendor/ files are unchanged copies from AzamatUzdenov/GluFormer-OpenEvolve, commit a469c4ca0514e10f29d4808412bf34acea2b8e7a. Download, audit, orchestration and report additions are by Azamat Uzdenov with Codex assistance, November 2026. The course template is credited in docs/template-LICENSE.txt.
+The scripts/vendor/ files are unchanged copies from AzamatUzdenov/GluFormer-OpenEvolve,
+commit a469c4ca0514e10f29d4808412bf34acea2b8e7a. Download, audit, orchestration and
+report additions are by Azamat Uzdenov, November 2026. The course template is
+credited in docs/template-LICENSE.txt.

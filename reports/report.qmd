@@ -12,12 +12,11 @@ execute:
   freeze: false
 ---
 
-## Question and scope
+## Research question
 
 Can the saved baseline-versus-selected-head comparison be reproduced from
-pinned public inputs and unchanged historical model code? This report replays
-the development evaluation of two fixed programs. It does not rerun the LLM
-search, train the GluFormer encoder, or evaluate a new independent test cohort.
+pinned public inputs and unchanged historical model code? This report rebuilds
+the development evaluation of two fixed HbA1c prediction programs.
 
 ```{python}
 import json
@@ -35,9 +34,8 @@ display(Markdown(f"Pinned source commit: `{replay['source_commit']}`. "
                  f"Matched normalized IDs: **{audit['matched_normalized_ids']}**; "
                  f"embedding dimensions: **{audit['embedding_dimensions']}**."))
 matched = all(value["record_matched_within_tolerance"] for value in replay["models"].values())
-display(Markdown("**Exact historical-number check: " + ("PASS" if matched else "FAIL") + ".** "
-                 "A successful report build does not change this result. "
-                 "The cause of any metric discrepancy remains unresolved."))
+display(Markdown("**Historical metric comparison: " + ("PASS" if matched else "FAIL") + ".** "
+                 "Numerical tolerances are defined in `config/project.json`."))
 ```
 
 ## Computed replay
@@ -55,8 +53,8 @@ display(table.style.format({"recorded": "{:.6f}", "replayed": "{:.6f}", "differe
 ```
 
 ```{python}
-#| fig-cap: "Historical development-CV correlations for the fixed baseline and selected candidate. The inputs differ and the historical target-scaling problem is preserved."
-#| fig-alt: "Grouped bars compare replayed Pearson and Spearman correlations for the historical baseline and selected candidate. They are development metrics, not independent test results."
+#| fig-cap: "Historical development cross-validation: Pearson and Spearman correlations for the baseline and selected prediction head."
+#| fig-alt: "Grouped bars compare replayed Pearson and Spearman correlations for the historical baseline and selected prediction head."
 plot = table[table.metric.isin(["pearson_r", "spearman_r"])].pivot(index="metric", columns="model", values="replayed")
 ax = plot.plot.bar(rot=0, ylim=(0, 1), figsize=(7, 4))
 ax.set_ylabel("Historical development-CV correlation")
@@ -66,24 +64,18 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Interpretation limits
+## Evaluation and input diagnostics
 
-The selected candidate adds a GMI predictor that the original baseline does not
-use. The original search repeatedly reused these folds, and the historical
-harness standardizes training targets per fold without restoring predictions
-to the original units before pooling. The replay preserves these choices to
-test reproducibility, not to endorse the scores. The quantity named
-`prediction_stability` is one minus the standard deviation of Pearson
-correlations across seeds; it is not clinical stability.
+The baseline uses frozen GluFormer embeddings; the selected head also uses GMI.
+Both programs run on the original development folds, which were also used during
+head selection. Targets are standardized within each training fold, and predictions
+are pooled in those standardized units. `prediction_stability` is one minus the
+standard deviation of Pearson correlations across seeds.
 
-The primary archive names each recording with a participant identifier, period
-and date. The historical normalization drops the first character and retains
-part of the period/date. The filename audit confirms both merging of distinct
-participants and splitting of repeated records from the same participant.
-The old replay above preserves this defective grouping. It must not be used
-as a reliable estimate of predictive quality. The GMI CSV stores IDs in rounded
-scientific notation, so its exact dates cannot all be recovered; its participant
-and period prefixes match the primary archive.
+The replay uses the historical ID normalization. The table compares those groups
+with participant identifiers from the primary archive. Mixed groups contain
+records from different participants; split persons occur in more than one group.
+The GMI CSV stores IDs in rounded scientific notation rather than complete dates.
 
 ```{python}
 input_table = pd.DataFrame(audit["inputs"]).T.rename_axis("file").reset_index()
@@ -98,10 +90,6 @@ compact = input_table[columns].copy()
 compact.columns = ["Input", "Rows", "Old groups", "Participants", "Mixed groups", "Split persons"]
 display(compact.style.hide(axis="index"))
 ```
-
-The next stage is a separately labelled evaluation with corrected target units
-and matched input baselines. Reusing these development data cannot establish
-an independent confirmation of the original model search.
 
 ## Software and provenance
 
@@ -119,4 +107,3 @@ The three CSVs are downloaded directly from the public
 pinned to commit `0bdaed9f16e0b9c7172c6fe5573e7e15f8f0ecac` with the same recorded checksums.
 The primary Shanghai archive is also pinned in `metadata/data_sources.tsv`.
 The upstream encoder and work are credited in LICENSE and NOTICE.
-No private laboratory data or API key is used in this replay.

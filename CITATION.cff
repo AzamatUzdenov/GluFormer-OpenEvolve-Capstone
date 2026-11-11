@@ -9,7 +9,7 @@ authors:
     orcid: "https://orcid.org/0009-0007-9124-7349"
 license: Apache-2.0
 repository-code: "https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone"
-version: 0.1.0
+version: 0.1.1
 date-released: "2026-11-11"
 references:
   - type: software
