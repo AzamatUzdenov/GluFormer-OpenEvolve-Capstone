@@ -4,7 +4,7 @@ description = "Reproduce and audit the saved OpenEvolve-selected HbA1c head"
 authors = ["Azamat Uzdenov <azamuzdenov@gmail.com>"]
 channels = ["conda-forge"]
 platforms = ["osx-arm64", "linux-64"]
-version = "0.1.0"
+version = "0.1.1"
 
 [dependencies]
 python = "3.10.*"
