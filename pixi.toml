@@ -22,7 +22,8 @@ papermill = ">=2.6,<3"
 download = "python scripts/download_data.py"
 audit = { cmd = "python scripts/audit_data.py", depends-on = ["download"] }
 replay = { cmd = "python scripts/replay.py", depends-on = ["audit"] }
-report = { cmd = "python scripts/render_report.py", depends-on = ["replay"] }
+notebook = { cmd = "python scripts/run_notebook.py", depends-on = ["download"] }
+report = { cmd = "python scripts/render_report.py", depends-on = ["replay", "notebook"] }
 reproduce = { depends-on = ["report"] }
 check = "python -m unittest discover -s tests -v"
 match-historical = "python scripts/check_historical_match.py"

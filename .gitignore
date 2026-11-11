@@ -6,7 +6,7 @@ data/processed/
 results/
 reports/*.html
 reports/*_files/
-.quarto/
+/.quarto/
 **/*.quarto_ipynb
 .ipynb_checkpoints/
 __pycache__/

@@ -29,6 +29,7 @@ if not (root / "config/project.json").exists():
     root = root.parent
 replay = json.loads((root / "results/replay.json").read_text())
 audit = json.loads((root / "results/data_audit.json").read_text())
+exploration = json.loads((root / "results/explore_inputs.json").read_text())
 display(Markdown(f"Pinned source commit: `{replay['source_commit']}`. "
                  f"Evaluation: **{replay['n_seeds']} seeds × {replay['n_folds']} folds**. "
                  f"Matched normalized IDs: **{audit['matched_normalized_ids']}**; "
@@ -38,9 +39,26 @@ display(Markdown("**Historical metric comparison: " + ("PASS" if matched else "F
                  "Numerical tolerances are defined in `config/project.json`."))
 ```
 
+## Input overview
+
+```{python}
+#| label: tbl-input-overview
+#| tbl-cap: "Dimensions and missing values in the pinned public input CSVs."
+pd.DataFrame(exploration["inputs"]).style.hide(axis="index")
+```
+
+The target file contains `{python} int(exploration['hba1c']['count'])` available
+HbA1c records, with a mean of `{python} f"{exploration['hba1c']['mean']:.1f}"`
+and a median of `{python} f"{exploration['hba1c']['50%']:.1f}"` mmol/mol.
+Repeated recordings can belong to the same participant.
+
+![HbA1c distribution across available records in the pinned public Shanghai target CSV. Repeated recordings can belong to the same participant.](../results/hba1c_records.png){#fig-hba1c-records fig-alt="Histogram of HbA1c records, with HbA1c in mmol/mol on the horizontal axis and the number of records on the vertical axis."}
+
 ## Computed replay
 
 ```{python}
+#| label: tbl-replay-metrics
+#| tbl-cap: "Recorded and replayed metrics for the two fixed prediction programs."
 rows = []
 for model, info in replay["models"].items():
     for metric, value in info["metrics"].items():
@@ -49,10 +67,11 @@ for model, info in replay["models"].items():
                      "replayed": value,
                      "difference": info["difference_from_record"][metric]})
 table = pd.DataFrame(rows)
-display(table.style.format({"recorded": "{:.6f}", "replayed": "{:.6f}", "difference": "{:+.6f}"}).hide(axis="index"))
+table.style.format({"recorded": "{:.6f}", "replayed": "{:.6f}", "difference": "{:+.6f}"}).hide(axis="index")
 ```
 
 ```{python}
+#| label: fig-development-correlations
 #| fig-cap: "Historical development cross-validation: Pearson and Spearman correlations for the baseline and selected prediction head."
 #| fig-alt: "Grouped bars compare replayed Pearson and Spearman correlations for the historical baseline and selected prediction head."
 plot = table[table.metric.isin(["pearson_r", "spearman_r"])].pivot(index="metric", columns="model", values="replayed")
@@ -78,6 +97,8 @@ records from different participants; split persons occur in more than one group.
 The GMI CSV stores IDs in rounded scientific notation rather than complete dates.
 
 ```{python}
+#| label: tbl-grouping-diagnostics
+#| tbl-cap: "Input records and historical grouping diagnostics from the primary archive filenames."
 input_table = pd.DataFrame(audit["inputs"]).T.rename_axis("file").reset_index()
 input_table["file"] = input_table["file"].map({
     "GluFormer_Representations_Shanghai_2023.csv": "Embeddings",
@@ -88,14 +109,16 @@ columns = ["file", "rows", "normalized_unique_ids", "participant_ids_from_archiv
            "historical_groups_merging_distinct_participants", "participants_split_across_historical_groups"]
 compact = input_table[columns].copy()
 compact.columns = ["Input", "Rows", "Old groups", "Participants", "Mixed groups", "Split persons"]
-display(compact.style.hide(axis="index"))
+compact.style.hide(axis="index")
 ```
 
 ## Software and provenance
 
 ```{python}
+#| label: tbl-software
+#| tbl-cap: "Software versions and fixed execution settings."
 software = pd.DataFrame(replay["software"].items(), columns=["Component", "Version / setting"])
-display(software.style.hide(axis="index"))
+software.style.hide(axis="index")
 ```
 
 The two fixed model programs are included in this capstone under `scripts/vendor/`.

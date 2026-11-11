@@ -26,6 +26,8 @@ prediction head, audits the public inputs, and builds tables and a correlation p
 The [computed report](reports/report.qmd) includes the evaluation settings,
 input diagnostics, software versions, and differences from the recorded metrics.
 
+[Exploration notebook](notebooks/explore-inputs.ipynb) · [Week 4 lab report](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/releases/tag/week-04-lab-2026-11-11)
+
 Run `pixi run --locked match-historical` for the separate strict numerical comparison.
 Tagged snapshots are available under [Releases](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/releases).
 
