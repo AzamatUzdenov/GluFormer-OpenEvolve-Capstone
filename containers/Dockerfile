@@ -17,6 +17,8 @@ COPY --from=build /opt/capstone/.pixi/envs/ /opt/capstone/.pixi/envs/
 COPY --from=build --chmod=0755 /entrypoint.sh /entrypoint.sh
 ENV CAPSTONE_ANALYSIS_BIN=/opt/capstone/.pixi/envs/default/bin
 ENV PATH=$CAPSTONE_ANALYSIS_BIN:$PATH
+# Snakemake logs the username even when the host UID has no passwd entry here.
+ENV USER=capstone
 
 # Mount the checkout here to keep inputs, results and the report on the host.
 WORKDIR /work
