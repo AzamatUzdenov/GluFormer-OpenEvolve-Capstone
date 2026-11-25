@@ -24,6 +24,22 @@ audit = { cmd = "python scripts/audit_data.py", depends-on = ["download"] }
 replay = { cmd = "python scripts/replay.py", depends-on = ["audit"] }
 notebook = { cmd = "python scripts/run_notebook.py", depends-on = ["download"] }
 report = { cmd = "python scripts/render_report.py", depends-on = ["replay", "notebook"] }
-reproduce = { depends-on = ["report"] }
+reproduce = [{ task = "run-snakemake", environment = "workflow" }]
 check = "python -m unittest discover -s tests -v"
 match-historical = "python scripts/check_historical_match.py"
+
+# Snakemake 9 needs Python 3.11 or newer. Keep the original Python 3.10
+# analysis environment and its locked packages separate.
+[feature.workflow]
+channels = ["conda-forge", "bioconda"]
+
+[feature.workflow.dependencies]
+python = "3.12.*"
+snakemake-minimal = ">=9.27.1,<10"
+
+[feature.workflow.tasks]
+run-snakemake = { cmd = "snakemake --snakefile workflow/Snakefile --cores 1 --rerun-incomplete", depends-on = [{ task = "download", environment = "default" }] }
+plan-snakemake = "snakemake --snakefile workflow/Snakefile --cores 1 --dry-run"
+
+[environments]
+workflow = { features = ["workflow"], no-default-feature = true }

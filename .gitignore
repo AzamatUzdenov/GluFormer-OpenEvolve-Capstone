@@ -1,6 +1,7 @@
 # Environments and generated files
 .pixi/
 .runtime/
+.snakemake/
 data/raw/
 data/processed/
 results/
