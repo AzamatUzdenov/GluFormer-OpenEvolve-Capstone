@@ -13,9 +13,13 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Local planning notes and unused container recipes
+# Local planning notes
 docs/PLAN_RU.txt
 docs/REQUIREMENTS_RU.txt
 docs/PROPOSAL_EN.txt
-containers/
+
+# Track the reproducible Docker recipe, not local images or other experiments.
+/containers/*
+!/containers/Dockerfile
+!/containers/Dockerfile.dockerignore
 .dockerignore
