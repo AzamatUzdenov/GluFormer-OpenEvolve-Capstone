@@ -1,0 +1,111 @@
+"""Run the existing analysis scripts as a file-based workflow."""
+
+import csv
+import os
+from pathlib import Path
+
+
+MANIFEST = "metadata/data_sources.tsv"
+with open(MANIFEST, newline="") as handle:
+    raw_names = [row["filename"] for row in csv.DictReader(handle, delimiter="\t")]
+if any(Path(name).name != name or name in ("", ".", "..") for name in raw_names):
+    raise ValueError("Data manifest filenames must be basenames")
+
+RAW_INPUTS = [f"data/raw/{name}" for name in raw_names]
+VENDOR_CODE = ["scripts/vendor/initial_program.py", "scripts/vendor/best_program.py"]
+SOURCE_METADATA = "metadata/source_code.json"
+PROJECT_CONFIG = "config/project.json"
+PROJECT_IO = "scripts/project_io.py"
+LOCK = "pixi.lock"
+ANALYSIS_BIN = os.environ.get("CAPSTONE_ANALYSIS_BIN", ".pixi/envs/default/bin")
+
+
+rule all:
+    input:
+        "reports/report.html",
+        ".runtime/explore-inputs.executed.ipynb",
+
+
+rule download:
+    input:
+        MANIFEST,
+        "scripts/download_data.py",
+    output:
+        RAW_INPUTS,
+    params:
+        bin=ANALYSIS_BIN,
+    shell:
+        "{params.bin:q}/python scripts/download_data.py"
+
+
+rule audit:
+    input:
+        RAW_INPUTS,
+        MANIFEST,
+        SOURCE_METADATA,
+        PROJECT_IO,
+        "scripts/vendor/initial_program.py",
+        "scripts/audit_data.py",
+        LOCK,
+    output:
+        "results/data_audit.json",
+    params:
+        bin=ANALYSIS_BIN,
+    shell:
+        "{params.bin:q}/python scripts/audit_data.py"
+
+
+rule replay:
+    input:
+        RAW_INPUTS,
+        "results/data_audit.json",
+        MANIFEST,
+        PROJECT_CONFIG,
+        SOURCE_METADATA,
+        VENDOR_CODE,
+        PROJECT_IO,
+        "scripts/replay.py",
+        LOCK,
+    output:
+        "results/replay.json",
+    params:
+        bin=ANALYSIS_BIN,
+    shell:
+        "{params.bin:q}/python scripts/replay.py"
+
+
+rule notebook:
+    input:
+        RAW_INPUTS,
+        MANIFEST,
+        PROJECT_IO,
+        "notebooks/explore-inputs.ipynb",
+        "scripts/run_notebook.py",
+        LOCK,
+    output:
+        "results/explore_inputs.json",
+        "results/hba1c_records.png",
+        ".runtime/explore-inputs.executed.ipynb",
+    params:
+        bin=ANALYSIS_BIN,
+    shell:
+        "PATH={params.bin:q}:\"$PATH\" {params.bin:q}/python scripts/run_notebook.py"
+
+
+rule report:
+    input:
+        "results/data_audit.json",
+        "results/replay.json",
+        "results/explore_inputs.json",
+        "results/hba1c_records.png",
+        "reports/report.qmd",
+        "_quarto.yml",
+        PROJECT_IO,
+        "scripts/render_report.py",
+        LOCK,
+    output:
+        "reports/report.html",
+    params:
+        bin=ANALYSIS_BIN,
+    shell:
+        "PATH={params.bin:q}:\"$PATH\" {params.bin:q}/python scripts/render_report.py"
