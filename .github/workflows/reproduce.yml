@@ -31,6 +31,44 @@ jobs:
       - name: Check input provenance and audit invariants
         run: pixi run check
 
+      - name: Build the locked Linux container
+        run: |
+          docker build --platform linux/amd64 -f containers/Dockerfile -t gluformer-capstone:ci .
+          image_id=$(docker image inspect gluformer-capstone:ci --format '{{.Id}}')
+          printf 'Locked Docker image ID `%s`\n' "$image_id" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Compare container and native outputs from clean clones
+        run: |
+          container_clone="$RUNNER_TEMP/gluformer-capstone-container"
+          git worktree add --detach "$container_clone" HEAD
+          docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp --mount "type=bind,source=$container_clone,target=/work" gluformer-capstone:ci
+          python3 - "$container_clone" <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+
+          native = Path.cwd()
+          container = Path(sys.argv[1])
+
+          def read_json(root, path):
+              return json.loads((root / path).read_text())
+
+          def metrics(root):
+              models = read_json(root, "results/replay.json")["models"]
+              return {name: model["metrics"] for name, model in models.items()}
+
+          for checkout in (native, container):
+              if (checkout / "reports/report.html").stat().st_size == 0:
+                  raise SystemExit(f"Empty report in {checkout}")
+          if metrics(native) != metrics(container):
+              raise SystemExit(f"Replayed metrics differ: {metrics(native)} != {metrics(container)}")
+          audit = "results/data_audit.json"
+          if read_json(native, audit) != read_json(container, audit):
+              raise SystemExit("Data audits differ")
+          print("Native and container metrics and input audits match.")
+          PY
+
       - name: Committed files must not change when the analysis runs
         run: git status --porcelain && git diff --exit-code
 

@@ -16,8 +16,26 @@ pixi run --locked check
 
 **Hardware:** CPU, macOS arm64 or Linux x86_64.
 **Outputs:** `reports/report.html` and the audit JSON files in `results/`.
-Measured on macOS arm64: about 1 GB for the environment, 5 MB of input data,
-and 40 seconds for a repeat run after installation and download.
+The analysis environment takes about 1 GB on macOS arm64. The workflow uses a
+second locked environment for Snakemake. The public inputs total about 5 MB.
+
+`reproduce` runs the [Snakemake workflow](workflow/Snakefile) to verify the data,
+audit the inputs, rerun the two predictors and rebuild the notebook and report.
+
+### Run in Docker
+
+From a fresh clone, build the Linux x86_64 environments from the same `pixi.lock`
+and run the same workflow:
+
+```bash
+docker build --platform linux/amd64 -f containers/Dockerfile -t gluformer-capstone .
+docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" \
+  --env HOME=/tmp --mount "type=bind,source=$PWD,target=/work" gluformer-capstone
+```
+
+The mount saves `reports/report.html` and `results/` in the clone. The
+[Reproduce check](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/actions/workflows/reproduce.yml)
+records the image ID and compares the Docker and native Linux metrics.
 
 ## Results
 
@@ -38,6 +56,7 @@ Tagged snapshots are available under [Releases](https://github.com/AzamatUzdenov
 - [`config/`](config) holds the replay settings and recorded comparison scores.
 - [`scripts/`](scripts) downloads inputs and rebuilds the analysis. The two unchanged historical predictors are under [`scripts/vendor/`](scripts/vendor).
 - [`notebooks/`](notebooks) and [`reports/`](reports) contain the input exploration and Quarto report source.
+- [`workflow/`](workflow) defines the Snakemake steps. [`containers/`](containers) builds the locked Linux environment.
 
 ## Data availability and licenses
 
