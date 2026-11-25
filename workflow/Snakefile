@@ -78,7 +78,6 @@ rule notebook:
     input:
         RAW_INPUTS,
         MANIFEST,
-        PROJECT_CONFIG,
         PROJECT_IO,
         "notebooks/explore-inputs.ipynb",
         "scripts/run_notebook.py",
