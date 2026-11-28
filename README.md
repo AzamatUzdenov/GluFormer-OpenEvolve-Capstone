@@ -21,6 +21,8 @@ second locked environment for Snakemake. The public inputs total about 5 MB.
 
 `reproduce` runs the [Snakemake workflow](workflow/Snakefile) to verify the data,
 audit the inputs, rerun the two predictors and rebuild the notebook and report.
+Conda users can pass [`envs/analysis.yml`](envs/analysis.yml) or
+[`envs/workflow.yml`](envs/workflow.yml) to `conda env create -f`.
 
 ### Run in Docker
 
@@ -36,6 +38,8 @@ docker run --rm --platform linux/amd64 --user "$(id -u):$(id -g)" \
 The mount saves `reports/report.html` and `results/` in the clone. The
 [Reproduce check](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/actions/workflows/reproduce.yml)
 records the image ID and compares the Docker and native Linux metrics.
+[Verified Linux build at `ce619f0`](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/actions/runs/45627886586):
+`sha256:f423ee11a1d3c66da354229afdb0547bbd604ad332803fa775790eb59b918017`.
 
 ## Results
 
@@ -48,6 +52,7 @@ input diagnostics, software versions, and differences from the recorded metrics.
 
 Run `pixi run --locked match-historical` for the separate strict numerical comparison.
 The historical scores match within the configured tolerances on Linux x86_64.
+Expected combined scores on Linux are 0.596 (baseline) and 0.621 (selected).
 The report builds on macOS arm64, where the Spearman scores differ slightly.
 Tagged snapshots are available under [Releases](https://github.com/AzamatUzdenov/GluFormer-OpenEvolve-Capstone/releases).
 
@@ -70,9 +75,9 @@ The workflow downloads the inputs from [recorded sources](metadata/data_sources.
 
 This project builds on Lutsker et al., [*A foundation model for continuous glucose monitoring data*](https://doi.org/10.1038/s41586-025-09925-9), published in *Nature* (2026). Cite this repository using [CITATION.cff](CITATION.cff).
 
-The code uses [Apache-2.0](LICENSE). The [NOTICE](NOTICE) retains attribution and the
-[course template's MIT license](docs/template-LICENSE.txt). No separate license
-has been declared for the report text and figures.
+The project code and original report text and figures use [Apache-2.0](LICENSE).
+The [NOTICE](NOTICE) retains attribution and the
+[course template's MIT license](docs/template-LICENSE.txt).
 
 ## Contact
 
