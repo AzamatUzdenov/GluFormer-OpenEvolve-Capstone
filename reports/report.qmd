@@ -16,7 +16,7 @@ execute:
 
 Can the saved baseline-versus-selected-head comparison be reproduced from
 pinned public inputs and unchanged historical model code? This report rebuilds
-the development evaluation of two fixed HbA1c prediction programs.
+the development evaluation of two fixed predictors of glycated hemoglobin (HbA1c).
 
 ```{python}
 import json
@@ -52,7 +52,18 @@ HbA1c records, with a mean of `{python} f"{exploration['hba1c']['mean']:.1f}"`
 and a median of `{python} f"{exploration['hba1c']['50%']:.1f}"` mmol/mol.
 Repeated recordings can belong to the same participant.
 
-![HbA1c distribution across available records in the pinned public Shanghai target CSV. Repeated recordings can belong to the same participant.](../results/hba1c_records.png){#fig-hba1c-records fig-alt="Histogram of HbA1c records, with HbA1c in mmol/mol on the horizontal axis and the number of records on the vertical axis."}
+```{python}
+#| label: fig-hba1c-records
+#| fig-cap: "HbA1c distribution across available records in the pinned public Shanghai target CSV."
+#| fig-alt: "Histogram of HbA1c in mmol/mol on the horizontal axis and number of records on the vertical axis."
+targets = pd.read_csv(root / "data/raw/Shanghai_results.csv", index_col=0)
+target = pd.to_numeric(targets.iloc[:, 0]).dropna()
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.hist(target, bins=15, color="black", edgecolor="white")
+ax.set(xlabel="HbA1c (mmol/mol)", ylabel="Records")
+fig.tight_layout()
+plt.show()
+```
 
 ## Computed replay
 
@@ -60,36 +71,55 @@ Repeated recordings can belong to the same participant.
 #| label: tbl-replay-metrics
 #| tbl-cap: "Recorded and replayed metrics for the two fixed prediction programs."
 rows = []
+model_names = {"baseline": "Baseline", "candidate": "Selected"}
+metric_names = {
+    "combined_score": "Combined score",
+    "pearson_r": "Pearson",
+    "spearman_r": "Spearman",
+    "prediction_stability": "Prediction stability",
+}
 for model, info in replay["models"].items():
     for metric, value in info["metrics"].items():
-        rows.append({"model": model, "metric": metric,
-                     "recorded": info["recorded_metrics"][metric],
-                     "replayed": value,
-                     "difference": info["difference_from_record"][metric]})
+        rows.append({"Model": model_names[model], "Metric": metric_names[metric],
+                     "Recorded": info["recorded_metrics"][metric],
+                     "Replayed": value,
+                     "Difference": info["difference_from_record"][metric]})
 table = pd.DataFrame(rows)
-table.style.format({"recorded": "{:.6f}", "replayed": "{:.6f}", "difference": "{:+.6f}"}).hide(axis="index")
+table.style.format({"Recorded": "{:.6f}", "Replayed": "{:.6f}", "Difference": "{:+.6f}"}).hide(axis="index")
 ```
 
 ```{python}
 #| label: fig-development-correlations
 #| fig-cap: "Historical development cross-validation: Pearson and Spearman correlations for the baseline and selected prediction head."
 #| fig-alt: "Grouped bars compare replayed Pearson and Spearman correlations for the historical baseline and selected prediction head."
-plot = table[table.metric.isin(["pearson_r", "spearman_r"])].pivot(index="metric", columns="model", values="replayed")
-ax = plot.plot.bar(rot=0, ylim=(0, 1), figsize=(7, 4))
-ax.set_ylabel("Historical development-CV correlation")
+plot = table[table["Metric"].isin(["Pearson", "Spearman"])].pivot(
+    index="Metric", columns="Model", values="Replayed"
+)
+ax = plot.plot.bar(rot=0, ylim=(0, 1), figsize=(7, 4),
+                   color=["black", "white"], edgecolor="black")
+ax.set_ylabel("Correlation in development cross-validation")
 ax.set_xlabel("")
 ax.legend(title="Fixed program")
 plt.tight_layout()
 plt.show()
 ```
 
+The replayed combined score was
+`{python} f"{replay['models']['baseline']['metrics']['combined_score']:.3f}"`
+for the baseline and
+`{python} f"{replay['models']['candidate']['metrics']['combined_score']:.3f}"`
+for the selected program.
+
 ## Evaluation and input diagnostics
 
-The baseline uses frozen GluFormer embeddings; the selected head also uses GMI.
+The baseline uses frozen GluFormer embeddings. The selected head also uses the
+glucose management indicator (GMI).
 Both programs run on the original development folds, which were also used during
-head selection. Targets are standardized within each training fold, and predictions
-are pooled in those standardized units. `prediction_stability` is one minus the
-standard deviation of Pearson correlations across seeds.
+head selection. An independent comparison would need held-out participants and
+the same inputs for both programs. Targets are standardized within each training
+fold. Predictions are pooled in these standardized units and correlated with
+observed HbA1c. Prediction stability is one minus the standard deviation of
+Pearson correlations across seeds.
 
 The replay uses the historical ID normalization. The table compares those groups
 with participant identifiers from the primary archive. Mixed groups contain
